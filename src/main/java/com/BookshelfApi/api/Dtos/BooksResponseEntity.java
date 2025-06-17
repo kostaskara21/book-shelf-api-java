@@ -10,7 +10,7 @@ public class BooksResponseEntity {
     private int PageNumber;
     private int PageSize;
     private int TotalPages;
-    private int TotalElements;
+    private long TotalElements;
     private boolean Last;
 
 }

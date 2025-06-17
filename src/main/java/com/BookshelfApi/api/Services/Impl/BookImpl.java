@@ -32,22 +32,22 @@ public class BookImpl implements BookService {
         this.bookRepo = bookRepo;
     }
 
+
     @Override
     public BooksResponseEntity GetAllBooks(int PageNumber, int PageSize) {
         Pageable pageable=  PageRequest.of(PageNumber,PageSize);
         Page<Books> Books = bookRepo.findAll(pageable);
         List<Books> ListofBooks = Books.getContent();
 
-
-
         List<BooksDto> content=ListofBooks.stream().map(book->BooksToBooksDto(book)).collect(Collectors.toList());
         BooksResponseEntity booksResponseEntity = new BooksResponseEntity();
         booksResponseEntity.setContext(content);
         booksResponseEntity.setPageNumber(Books.getNumber());
         booksResponseEntity.setPageSize(Books.getSize());
-        booksResponseEntity.setTotalElements(Books.getNumberOfElements());
+        booksResponseEntity.setTotalElements(Books.getTotalElements());
         booksResponseEntity.setTotalPages(Books.getTotalPages());
         booksResponseEntity.setLast(Books.isLast());
+        
         return booksResponseEntity;
     }
 
