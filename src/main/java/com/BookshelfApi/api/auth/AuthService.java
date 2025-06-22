@@ -26,6 +26,7 @@ public class AuthService {
         System.out.println("Email: " + request.getEmail());
         System.out.println("Password: " + request.getPassword());
 
+
         var user= User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
