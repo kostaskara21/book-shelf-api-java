@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   db:
@@ -10,7 +9,9 @@ services:
       POSTGRES_PASSWORD: 123
       POSTGRES_DB: bookreview
     ports:
-      - "5432:5432"
+      - "5431:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
     networks:
       - spring-network
 
@@ -31,3 +32,6 @@ services:
 
 networks:
   spring-network:
+
+volumes:
+  pgdata:
