@@ -11,14 +11,14 @@ import java.util.List;
 @Service
 public interface BookService {
 
-    BooksResponseEntity GetAllBooks(int PageNumber, int PageSize);
+    BooksResponseEntity getAllBooks(int PageNumber, int PageSize);
 
-    Books CreateBook(BooksDto BookDto);
+    Books createBook(BooksDto BookDto);
 
-    BooksDto UpdateBook(int id,BooksDto BookDto);
+    BooksDto updateBook(int id,BooksDto BookDto);
 
-    BooksDto GetBookById(int id);
+    BooksDto getBookById(int id);
 
-    void DeleteBook(int id);
+    void deleteBook(int id);
 
 }

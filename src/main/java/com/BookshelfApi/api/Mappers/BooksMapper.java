@@ -5,7 +5,7 @@ import com.BookshelfApi.api.Models.Books;
 
 public class BooksMapper {
 
-    public static Books BooksDtoToBooks(BooksDto booksDto) {
+    public static Books booksDtoToBooks(BooksDto booksDto) {
         return new Books().builder()
                 .Title(booksDto.getTitle())
                 .Description(booksDto.getDescription())
@@ -13,7 +13,7 @@ public class BooksMapper {
                 .build();
     }
 
-    public static BooksDto BooksToBooksDto(Books books) {
+    public static BooksDto booksToBooksDto(Books books) {
         return new BooksDto().builder()
                 .Title(books.getTitle())
                 .Description(books.getDescription())

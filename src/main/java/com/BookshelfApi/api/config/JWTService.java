@@ -21,8 +21,6 @@ import java.util.function.Function;
 
 public class JWTService {
 
-
-
     private String secretKey = "12345678901234567890123456789012";
 
 

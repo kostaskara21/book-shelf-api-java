@@ -5,6 +5,7 @@ import com.BookshelfApi.api.Models.User;
 import com.BookshelfApi.api.Repository.UserRepo;
 import com.BookshelfApi.api.config.JWTService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
 
     private final UserRepo userRepo;
@@ -21,24 +23,18 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
 
     public AuthResponse register(RegisterRequest request) {
-        System.out.println("firstName: " + request.getFirstName());
-        System.out.println("lastName: " + request.getLastName());
-        System.out.println("Email: " + request.getEmail());
-        System.out.println("Password: " + request.getPassword());
 
+        log.info("Register request received");
+        var user= buildUser(request,passwordEncoder);
 
-        var user= User.builder()
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.USER)
-                .build();
         userRepo.save(user);
+
         var Jwt= jwtService.generateToken(user);
+
         return AuthResponse.builder().token(Jwt).build();
 
     }
+
 
 
     public AuthResponse authenticate(AuthenticvationRequest authRequest) {
@@ -55,6 +51,17 @@ public class AuthService {
         var user = userRepo.findByEmail(authRequest.getEmail()).orElseThrow();
         var Jwt = jwtService.generateToken(user);
         return AuthResponse.builder().token(Jwt).build();
+    }
+
+
+    private User buildUser(RegisterRequest request,PasswordEncoder passwordEncoder) {
+        return User.builder()
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(Role.USER)
+                .build();
     }
 
 }

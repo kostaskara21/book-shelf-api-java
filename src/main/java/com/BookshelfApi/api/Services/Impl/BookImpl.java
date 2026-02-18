@@ -7,6 +7,8 @@ import com.BookshelfApi.api.Exceptions.BookNotFoundException;
 import com.BookshelfApi.api.Models.Books;
 import com.BookshelfApi.api.Repository.BookRepo;
 import com.BookshelfApi.api.Services.BookService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.data.domain.Pageable;
@@ -23,61 +25,100 @@ import java.util.stream.Collectors;
 import static com.BookshelfApi.api.Mappers.BooksMapper.*;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class BookImpl implements BookService {
 
-    private BookRepo bookRepo;
-
-    @Autowired
-    public BookImpl(BookRepo bookRepo) {
-        this.bookRepo = bookRepo;
-    }
+    private final  BookRepo bookRepo;
 
 
     @Override
-    public BooksResponseEntity GetAllBooks(int PageNumber, int PageSize) {
+    public BooksResponseEntity getAllBooks(int PageNumber, int PageSize) {
+
+        log.info("Received Request fetching books in {} pages", PageNumber);
+
         Pageable pageable=  PageRequest.of(PageNumber,PageSize);
-        Page<Books> Books = bookRepo.findAll(pageable);
-        List<Books> ListofBooks = Books.getContent();
+        Page<Books> books = bookRepo.findAll(pageable);
+        List<Books> listofBooks = books.getContent();
 
-        List<BooksDto> content=ListofBooks.stream().map(book->BooksToBooksDto(book)).collect(Collectors.toList());
-        BooksResponseEntity booksResponseEntity = new BooksResponseEntity();
-        booksResponseEntity.setContext(content);
-        booksResponseEntity.setPageNumber(Books.getNumber());
-        booksResponseEntity.setPageSize(Books.getSize());
-        booksResponseEntity.setTotalElements(Books.getTotalElements());
-        booksResponseEntity.setTotalPages(Books.getTotalPages());
-        booksResponseEntity.setLast(Books.isLast());
-        
-        return booksResponseEntity;
+        log.info("{} Books found in database", listofBooks.size());
+        List<BooksDto> content=mapToBooksDto(listofBooks);
+
+        return makeBooksResponseEntity(books,content);
+    }
+
+
+
+
+    @Override
+    public Books createBook(BooksDto bookDto) {
+        log.info("Received Request creating book {}", bookDto.getTitle());
+        validateBook(bookDto);
+        Books books = booksDtoToBooks(bookDto);
+        log.info("{} Book created", books.getTitle());
+        return bookRepo.save(books);
+    }
+
+
+
+    @Override
+    public BooksDto updateBook(int id, BooksDto bookDto) {
+        log.info("Received Request updatig book {}", bookDto.getTitle());
+        Books book= findBookById(id);
+        log.info("{} Book found", book.getTitle());
+        makeBookfromBookDto(bookDto,book);
+        log.info("{} Book updated", book.getTitle());
+        return booksToBooksDto(bookRepo.save(book));
+    }
+
+
+    @Override
+    public BooksDto getBookById(int id) {
+        log.info("Received Request to find book with id  {}", id);
+        Books books = findBookById(id);
+        log.info("{} Book found", books.getTitle());
+        return booksToBooksDto(books);
     }
 
     @Override
-    public Books CreateBook(BooksDto BookDto) {
-        if(BookDto.getTitle().isEmpty() || BookDto.getAuthor().isEmpty()||BookDto.getDescription().isEmpty() ){
-            throw new BookCouldntCreate("Missing Required Fields");
-        }
-       Books books = BooksDtoToBooks(BookDto);
-       return bookRepo.save(books);
-    }
-
-    @Override
-    public BooksDto UpdateBook(int id, BooksDto BookDto) {
-        Books book= bookRepo.findById(id).orElseThrow(()->new BookNotFoundException("Book not found"));
-        book.setAuthor(BookDto.getAuthor());
-        book.setTitle(BookDto.getTitle());
-        book.setDescription(BookDto.getDescription());
-        return BooksToBooksDto(bookRepo.save(book));
-    }
-
-    @Override
-    public BooksDto GetBookById(int id) {
-        Books books = bookRepo.findById(id).orElseThrow(()->new BookNotFoundException("There is Not Such A Book with this Id"));
-        return BooksToBooksDto(books);
-    }
-
-    @Override
-    public void DeleteBook(int id) {
-        Books book=bookRepo.findById(id).orElseThrow(()->new BookNotFoundException("Book not found"));
+    public void deleteBook(int id) {
+        log.info("Received Request to delete book with id  {}", id);
+        Books book=findBookById(id);
+        log.info("Book found");
         bookRepo.delete(book);
     }
+
+    private BooksResponseEntity makeBooksResponseEntity(Page<Books> Books,List<BooksDto> BooksDto) {
+        return BooksResponseEntity.builder()
+                .context(BooksDto)
+                .PageNumber(Books.getNumber())
+                .PageSize(Books.getSize())
+                .TotalElements(Books.getTotalElements())
+                .TotalPages(Books.getTotalPages())
+                .Last(Books.isLast())
+                .build();
+    }
+
+    private List<BooksDto> mapToBooksDto(List<Books> books){
+        return books.stream().map(book->booksToBooksDto(book)).collect(Collectors.toList());
+    }
+
+    private void validateBook(BooksDto booksDto){
+        log.info("Validating given Book...");
+        if(booksDto.getTitle().isEmpty() || booksDto.getAuthor().isEmpty() || booksDto.getDescription().isEmpty() ){
+            throw new BookCouldntCreate("Missing Required Fields");
+        }
+    }
+
+    private Books findBookById(int id) {
+        log.info("Trying to find book by id {}", id);
+        return bookRepo.findById(id).orElseThrow(()->new BookNotFoundException("Book not found"));
+    }
+
+    private void makeBookfromBookDto(BooksDto bookDto,Books book) {
+        book.setAuthor(bookDto.getAuthor());
+        book.setTitle(bookDto.getTitle());
+        book.setDescription(bookDto.getDescription());
+    }
+
 }
