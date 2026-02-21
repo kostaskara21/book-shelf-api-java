@@ -1,6 +1,7 @@
 package com.BookshelfApi.api.auth;
 
 
+import com.BookshelfApi.api.constants.AuthEndpointsConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
-@RequestMapping("api/auth")
+@RequestMapping(AuthEndpointsConstants.BASIC_URL)
 @RequiredArgsConstructor
 public class AuthenticationController {
 
@@ -17,13 +18,13 @@ public class AuthenticationController {
 
 
 
-    @PostMapping("/register")
+    @PostMapping(AuthEndpointsConstants.REGISTER)
     public ResponseEntity<AuthResponse> register(
             @RequestBody RegisterRequest requests){
         return ResponseEntity.ok(authService.register(requests));
     }
 
-    @PostMapping("/authenticate")
+    @PostMapping(AuthEndpointsConstants.AUTHENTICATE)
     public ResponseEntity<AuthResponse> authenticate(
             @RequestBody AuthenticvationRequest requests){
         try {

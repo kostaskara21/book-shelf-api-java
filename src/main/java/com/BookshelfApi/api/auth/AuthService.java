@@ -38,19 +38,21 @@ public class AuthService {
 
 
     public AuthResponse authenticate(AuthenticvationRequest authRequest) {
+        log.info("Authentication request received checking to Authenticate user");
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             authRequest.getEmail(),
                             authRequest.getPassword())
             );
+
         } catch (Exception e) {
             System.out.println("Authentication failed: " + e.getMessage());
             throw e;
         }
         var user = userRepo.findByEmail(authRequest.getEmail()).orElseThrow();
-        var Jwt = jwtService.generateToken(user);
-        return AuthResponse.builder().token(Jwt).build();
+        var jwt = jwtService.generateToken(user);
+        return AuthResponse.builder().token(jwt).build();
     }
 
 

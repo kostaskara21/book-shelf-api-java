@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Maven wrapper
+.mvn/wrapper/
+mvnw
+mvnw.cmd
