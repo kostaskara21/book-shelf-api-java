@@ -5,6 +5,7 @@ import com.BookshelfApi.api.Dtos.BooksResponseEntity;
 import com.BookshelfApi.api.Models.Books;
 import com.BookshelfApi.api.Services.BookService;
 import com.BookshelfApi.api.constants.BookEndpointsConstants;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,8 @@ import static com.BookshelfApi.api.Mappers.BooksMapper.booksToBooksDto;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
+
 public class BookController {
 
     private  final BookService bookService;

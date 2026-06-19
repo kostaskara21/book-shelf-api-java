@@ -3,7 +3,6 @@ package com.BookshelfApi.api.auth;
 import com.BookshelfApi.api.Models.Enum.Role;
 import com.BookshelfApi.api.Models.User;
 import com.BookshelfApi.api.Repository.UserRepo;
-import com.BookshelfApi.api.config.JWTService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +18,7 @@ public class AuthService {
 
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
-    private final JWTService jwtService;
+    private final com.BookshelfApi.api.auth.JWTService jwtService;
     private final AuthenticationManager authenticationManager;
 
     public AuthResponse register(RegisterRequest request) {
